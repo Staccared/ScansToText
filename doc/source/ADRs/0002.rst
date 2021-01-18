@@ -1,0 +1,22 @@
+Supported file formats
+======================
+
+* Status: accepted
+* Deciders: Michael Koltan
+* Date: 2021-01-18
+
+Users should upload files in various formats for the digital archivist. In the beginning we should only
+support the most needed format.
+
+Context and Problem Statement
+-----------------------------
+
+There are dozens of file formats we might encounter in archives. We should at
+least support tiff (recommended for archiving), pdf (very common) and probably
+jpg, because some scanners produce jpg by default. And zip-Archives
+of the other file formats.
+
+Decision Outcome
+----------------
+
+For a first go we only support pdf.

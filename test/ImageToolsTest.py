@@ -4,7 +4,7 @@ Created on 17.01.2021
 @author: michael
 '''
 import unittest
-from PIL import Image, ImageChops
+from PIL import ImageChops
 import os
 from ImageTools import pil_to_numpy, numpy_to_pil, load
 
