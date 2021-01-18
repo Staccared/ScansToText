@@ -51,7 +51,8 @@ class PdfInput:
         with open(os.devnull, 'wb') as devnull:
             return_value = call(["gs",
                                  "-sDEVICE=png16m",
-                                 "-dNOPAUSE", "-dFirstPage={}".format(pageno),
+                                 "-dNOPAUSE",
+                                 "-dFirstPage={}".format(pageno),
                                  "-dLastPage={}".format(pageno),
                                  "-sOutputFile={}".format(image_file),
                                  "-r300",
