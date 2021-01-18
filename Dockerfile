@@ -12,6 +12,9 @@ ENV VIRTUAL_ENV=/opt/scanstotext/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
+# pip upgrade required for PyPDF2 building without errors
+RUN python -m pip install --upgrade pip
+
 ADD requirements.txt /opt/scanstotext/requirements.txt
 RUN pip install -r /opt/scanstotext/requirements.txt
 
