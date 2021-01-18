@@ -10,12 +10,7 @@ Created on 18.01.2021
 from PIL import Image
 from PyPDF2.pdf import PdfFileReader
 import tempfile
-import os
-from subprocess import call
-
-
-class PdfProcessingError(Exception):
-    pass
+import subprocess
 
 
 class PdfInput:
@@ -42,29 +37,26 @@ class PdfInput:
         return page.extractText()
     
     def get_page_image(self, pageno):
-        with tempfile.NamedTemporaryFile("wb") as tmp_file:
+        with tempfile.NamedTemporaryFile() as tmp_file:
             with self._open_page_image(pageno, tmp_file.name) as image:
                 image.load()
                 return image
 
     def _open_page_image(self, pageno, image_file):
-        with open(os.devnull, 'wb') as devnull:
-            return_value = call(["gs",
-                                 "-sDEVICE=png16m",
-                                 "-dNOPAUSE",
-                                 "-dFirstPage={}".format(pageno),
-                                 "-dLastPage={}".format(pageno),
-                                 "-sOutputFile={}".format(image_file),
-                                 "-r300",
-                                 "-q",
-                                 self.filename,
-                                 "-c",
-                                 "quit"],
-                                stdout=devnull,
-                                stderr=devnull)
-
-        if return_value != 0:
-            raise PdfProcessingError()
+        subprocess.run([
+                "gs",
+                "-sDEVICE=png16m",
+                "-dNOPAUSE",
+                "-dFirstPage={}".format(pageno),
+                "-dLastPage={}".format(pageno),
+                "-sOutputFile={}".format(image_file),
+                "-r300",
+                "-q",
+                self.filename,
+                "-c",
+                "quit"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL)
 
         return Image.open(image_file)
 
