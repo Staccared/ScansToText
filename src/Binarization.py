@@ -6,11 +6,15 @@ Created on 17.01.2021
 import cv2 as cv
 
 from skimage.filters import (threshold_sauvola)
+from optparse import OptionParser
+
 from ImageTools import load, pil_to_numpy, numpy_to_pil
+
 
 class BinarizationError(Exception):
     
     pass
+
 
 class Binarazer:
     '''
@@ -47,9 +51,42 @@ class Binarazer:
         binary_image = ndarray > mask
         return numpy_to_pil(binary_image)
 
-if __name__ == '__main__':
-    
-    image = load("../test/testdata/Test1.tif")
+
+def main():
+    (input_file, output_file, show) = get_opts()
+    image = load(input_file)
     binarizer = Binarazer()
     image = binarizer.convert_to_bitmap(image)
-    image.show()
+    if output_file is not None:
+        if output_file == '-':
+            image.save(output_file)
+        else:
+            image.save(output_file)
+    if show:
+        image.show()
+
+
+def get_opts():
+    parser = OptionParser(usage="Usage: %prog [options] <input-file> [output-file]")
+    parser.add_option("-s", "--show",
+                      dest="show",
+                      action="store_true",
+                      default=False,
+                      help="Show image when done")
+    (options, args) = parser.parse_args()
+
+    if len(args) < 1:
+        parser.error("Incorrect number of arguments")
+
+    input_file = args[0];
+
+    if len(args) > 1:
+        output_file = args[1]
+    else:
+        output_file = None;
+
+    return input_file, output_file, options.show
+
+
+if __name__ == '__main__':
+    main()
