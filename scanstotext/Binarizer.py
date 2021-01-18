@@ -1,23 +1,17 @@
-'''
+"""
 Created on 17.01.2021
 
 @author: michael
-'''
-import cv2 as cv
+"""
 
+import cv2 as cv
 from skimage.filters import (threshold_sauvola)
 from optparse import OptionParser
-
 from ImageTools import load, pil_to_numpy, numpy_to_pil
 
 
-class BinarizationError(Exception):
-    
-    pass
-
-
-class Binarazer:
-    '''
+class Binarizer:
+    """
     There are several algorithms for binarization:
     - simple threshold: Needs to be adapted depending on paper etc. Not very effective
     - Otsu's algorithm: Works quiet well, but uses one threshold value for the whole
@@ -28,7 +22,7 @@ class Binarazer:
     - Sauvola's algorithm: Best result until now.
     - Shafait's algorithm: The newest one (2008) No Python implementation found yet and
       therefore not tested.
-    '''
+    """
     
     def convert_to_bitmap(self, image):
         
@@ -55,7 +49,7 @@ class Binarazer:
 def main():
     (input_file, output_file, show) = get_opts()
     image = load(input_file)
-    binarizer = Binarazer()
+    binarizer = Binarizer()
     image = binarizer.convert_to_bitmap(image)
     if output_file is not None:
         if output_file == '-':

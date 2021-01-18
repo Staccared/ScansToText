@@ -5,7 +5,7 @@ Created on 18.01.2021
 '''
 import unittest
 import os
-from StaccaredProject import ProjectInitializer
+from scanstotext.StaccaredProject import ProjectInitializer
 
 
 class ProjectInitializerTest(unittest.TestCase):

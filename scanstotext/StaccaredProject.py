@@ -1,12 +1,14 @@
-'''
+"""
 Created on 18.01.2021
 
 @author: michael
-'''
-from FileLoader import PdfLoader
+"""
+
+from scanstotext.PdfInput import PdfInput
 
 TEXTDATA = 1
 CONTAINER = 2
+
 
 class StaccaredProject:
     
@@ -15,6 +17,7 @@ class StaccaredProject:
         self.files = files
         self.texts = texts
 
+
 class File:
     
     def __init__(self, filename, file_id):
@@ -22,6 +25,7 @@ class File:
         self.filename = filename
         self.file_id = file_id
         self.type = TEXTDATA
+
 
 class MetadataEntity:
     
@@ -32,7 +36,8 @@ class MetadataEntity:
         self.wiki_data_id
         self.occurencies
         self.confidentiality
-        
+
+
 class Metadata:
     
     def __init__(self):
@@ -41,7 +46,8 @@ class Metadata:
         self.personen = []
         self.koerperschaften = []
         self.sachbegriffe = []
-        
+
+
 class TextBlock:
     
     def __init__(self, file_id, page_no, text):
@@ -50,7 +56,8 @@ class TextBlock:
         self.page_no = page_no
         self.text = text
         self.metadata = Metadata()
-        
+
+
 class Text:
     
     def __init__(self):
@@ -67,8 +74,10 @@ class Text:
         text = ""
         for textblock in self.textblocks:
             text = "%s %s" % (text, textblock.text)
+        return text
             
     text = property(_get_text)
+
 
 class ProjectInitializer:
     
@@ -78,7 +87,7 @@ class ProjectInitializer:
         file = File(filename, file_id)
 
         # Currently we support only one pdf-file
-        loader = PdfLoader(filename)
+        loader = PdfInput(filename)
         text = Text()
         for page_no in range(1, loader.get_number_of_pages() + 1):
             textblock = TextBlock(file_id, page_no, loader.get_page_text(page_no))

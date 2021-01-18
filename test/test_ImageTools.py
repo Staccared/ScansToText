@@ -6,7 +6,7 @@ Created on 17.01.2021
 import unittest
 from PIL import ImageChops
 import os
-from ImageTools import pil_to_numpy, numpy_to_pil, load
+from scanstotext.ImageTools import pil_to_numpy, numpy_to_pil, load
 
 class ImageToolsTest(unittest.TestCase):
 
@@ -17,7 +17,7 @@ class ImageToolsTest(unittest.TestCase):
 
         testfile_name = os.path.join(self.testfile_dir, "Color.tif")
         image = load(testfile_name)
-        self.assertEquals(image.mode, "L")
+        self.assertEqual(image.mode, "L")
 
     def testLoad(self):
         

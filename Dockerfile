@@ -25,10 +25,11 @@ RUN \
   env DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata && \
   apt-get install -y libgl1-mesa-glx libglib2.0-0
 
+RUN apt-get install -y ghostscript
 
-ADD src/ /opt/scanstotext/scanstotext
+ADD scanstotext/ /opt/scanstotext/scanstotext
 
 WORKDIR /opt/scanstotext/scanstotext
 ENTRYPOINT [ "python" ]
-CMD [ "Binarization.py" ]
+CMD [ "Binarizer.py" ]
 
