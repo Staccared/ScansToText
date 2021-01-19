@@ -11,7 +11,7 @@ from PIL import Image
 from PyPDF2.pdf import PdfFileReader
 import tempfile
 import subprocess
-
+import sys
 
 class PdfInput:
     
@@ -42,7 +42,17 @@ class PdfInput:
                 image.load()
                 return image
 
+    def get_page_png_file(self, pageno):
+        tmp_file = tempfile.NamedTemporaryFile(suffix=".png")
+
+        with self._open_page_image(pageno, tmp_file.name) as image:
+            image.save(tmp_file)
+
+        return tmp_file
+
     def _open_page_image(self, pageno, image_file):
+        print("pdf -> png...", file=sys.stderr)
+
         subprocess.run([
                 "gs",
                 "-sDEVICE=png16m",

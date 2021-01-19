@@ -11,12 +11,10 @@ Build Docker image:
 docker build . -t scanstotext:latest
 ```
 
-Run `Binarization.py` with local test file:
+Run `very_simple_pipeline.py` with local test file:
 
 ```
-docker run -it --rm \
-  -v "$(pwd):/data" \
-  -u $(id -u) \
-  scanstotext Binarization.py \
-  /data/test/testdata/Test1.tif /data/test/testdata/out.jpg
+docker run --rm -v "$(pwd):/data" -u $(id -u) \
+  scanstotext \
+  /data/test/testdata/Test-Grüne001.pdf
 ```
