@@ -10,12 +10,14 @@ class Tesseract:
         return self._extract(input_file, False)
 
     def _extract(self, input_file, hocr):
+        # --psm 1 = Automatic page segmentation with OSD. (Orientation and script detection)
         cmd = [
             self.executable,
             input_file,
             "stdout",
             "-l",
             self.language,
+            "--psm", "1"
         ]
 
         if hocr:
