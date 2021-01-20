@@ -5,9 +5,11 @@ Created on 17.01.2021
 """
 
 import cv2 as cv
+import numpy
 from skimage.filters import (threshold_sauvola)
 from optparse import OptionParser
-from ImageTools import load, pil_to_numpy, numpy_to_pil
+from scanstotext.ImageTools import load, pil_to_numpy, numpy_to_pil
+from pickle import TRUE
 
 
 class Binarizer:
@@ -26,24 +28,83 @@ class Binarizer:
     
     def convert_to_bitmap(self, image):
         
-        return self._binarization_sauvola(image)
+        nd_array = pil_to_numpy(image)
+        
+        bw_array = self._binarization_sauvola(nd_array)
+        denoised_array = self._denoise_image(bw_array)
+        
+        return numpy_to_pil(denoised_array)
     
-    def _binarization_fixed(self, img, threshold=127):
+    def _binarization_fixed(self, nd_array, threshold=127):
 
-        used_threshold, binary_image = cv.threshold(pil_to_numpy(img),threshold,255,cv.THRESH_BINARY)
-        return numpy_to_pil(binary_image)
+        used_threshold, bw_array = cv.threshold(nd_array,threshold,255,cv.THRESH_BINARY)
+        return bw_array
     
-    def _binarization_otsu(self, img):
+    def _binarization_otsu(self, nd_array):
 
-        used_threshold, binary_image = cv.threshold(pil_to_numpy(img),127,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
-        return numpy_to_pil(binary_image)
+        used_threshold, binary_image = cv.threshold(nd_array,127,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
+        return binary_image
 
-    def _binarization_sauvola(self, image, window_size=41):
+    def _binarization_sauvola(self, nd_array, window_size=25):
 
-        ndarray = pil_to_numpy(image)
-        mask = threshold_sauvola(ndarray, window_size=window_size)
-        binary_image = ndarray > mask
-        return numpy_to_pil(binary_image)
+        mask = threshold_sauvola(nd_array, window_size=window_size)
+        return nd_array > mask
+    
+    def _denoise_image(self, bw_array, threshold=10):
+        '''
+        This is quite complicated because connectedComponentsWithStats is not
+        very well documented.
+        
+        First of all we need a numeric array - the input is a boolean array.
+        And then we need to invert the image, because connectedComponentsWithStats
+        treats black (1, True) as background and white (0, False) as graphical shapes
+        
+        Components are shapes that form an area. The connectivity parameter
+        denotes what counts as connected. If the value is 4, only the pixels
+        left, right, top and bottom are considered, if it is 8, also the
+        diagonals are included.
+        
+        The result is quite confusing:
+        no_of_components: The exact number of found shapes + 1 (for the
+            background)
+        labels: Each shape gets a unique identifier, where the identifiers
+            are just numbers, counting up from 1. 0 is the background, so we
+            exclude it in the loop, just in case you were wondering. labels
+            itself is an array with the same dimension as the input image. And
+            in each cell there is the number of the identifier of the shape
+            this cell belongs to
+        stats: This is an array of length no_of_components and contains
+            statistical information for each share. We are only interested
+            in the size which is accessible through CC_STAT_AREA.
+        centroids: Does not interest us
+        
+        The obvious algorithm then to loop over all shapes an clean up the
+        small shapes is sadly not very efficient, because there are quite
+        a lot of small shapes.
+        So it makes sense to use a blank sheet and add all the big shapes,
+        this is much faster. Why I need to initialize the sheet with 1s (black)
+        and add the shapes as white I can't understand. But that's how
+        it works.
+        
+        '''
+        black = 1
+        white = 0
+        inverted = numpy.ones((bw_array.shape), dtype=numpy.uint8)
+        inverted[bw_array == black] = white
+        
+        connectivity = 8
+        no_of_components, labels, stats, centroids = cv.connectedComponentsWithStats(inverted, connectivity, cv.CV_32S)
+        sizes = stats[:, cv.CC_STAT_AREA];
+
+        # Why initializing with ones?
+        bw_new = numpy.ones((bw_array.shape), dtype=numpy.bool)
+        for shape_identifier in range(1, no_of_components):
+            if sizes[shape_identifier] > threshold:
+                # I really do not understand why I need bool_white
+                # and not bool_black. I'm giving up.
+                bw_new[labels == shape_identifier] = white
+        
+        return bw_new
 
 
 def main():
