@@ -55,21 +55,21 @@ class Binarizer:
         This is quite complicated because connectedComponentsWithStats is not
         very well documented.
         
-        First of all we need a numeric array - the input is a boolean array.
+        First of all we need a numeric array - the input to the method is a boolean array.
         And then we need to invert the image, because connectedComponentsWithStats
-        treats black (1, True) as background and white (0, False) as graphical shapes
+        treats black (1) as background and white (0) as components.
         
         Components are shapes that form an area. The connectivity parameter
-        denotes what counts as connected. If the value is 4, only the pixels
+        denotes what is considered as connection. If the value is 4, only the pixels
         left, right, top and bottom are considered, if it is 8, also the
         diagonals are included.
         
-        The result is quite confusing:
+        The result array is quite confusing:
         no_of_components: The exact number of found shapes + 1 (for the
             background)
         labels: Each shape gets a unique identifier, where the identifiers
-            are just numbers, counting up from 1. 0 is the background, so we
-            exclude it in the loop, just in case you were wondering. labels
+            are just numbers, counting up from 1 (0 is the background, so we
+            exclude it in the loop, just in case you were wondering). labels
             itself is an array with the same dimension as the input image. And
             in each cell there is the number of the identifier of the shape
             this cell belongs to
@@ -78,7 +78,13 @@ class Binarizer:
             in the size which is accessible through CC_STAT_AREA.
         centroids: Does not interest us
         
-        The obvious algorithm then to loop over all shapes an clean up the
+        Then something to the numpy indexing with boolean values like
+        array1[array2 == black]. This means if array1 and array2 are
+        two arrays with the same dimensions, then select all array elements
+        from array1 where the array element in array2 with the same
+        indexes matches the condition.
+        
+        The obvious algorithm is to loop over all shapes and clean up the
         small shapes is sadly not very efficient, because there are quite
         a lot of small shapes.
         So it makes sense to use a blank sheet and add all the big shapes,
